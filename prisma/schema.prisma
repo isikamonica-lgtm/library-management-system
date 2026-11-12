@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-d
+// Prisma Client generator
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+// PostgreSQL database
+datasource db {
+  provider = "postgresql"
+}
+
+// Roles available to library users
+enum Role {
+  PATRON
+  LIBRARIAN
+}
+
+// Stores registered library users
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  role      Role     @default(PATRON)
+  reviews   Review[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Stores book categories
+model Genre {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  books       Book[]
+  createdAt   DateTime @default(now())
+}
+
+// Stores library books
+model Book {
+  id              String @id @default(uuid())
+  title           String
+  author          String
+  isbn            String @unique
+  publicationYear Int?
+  totalCopies     Int    @default(1)
+  availableCopies Int    @default(1)
+
+  genreId String
+  genre   Genre  @relation(fields: [genreId], references: [id])
+
+  reviews   Review[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Stores reviews written by users about books
+model Review {
+  id      String  @id @default(uuid())
+  bookId  String
+  userId  String
+  rating  Int
+  comment String?
+
+  book Book @relation(fields: [bookId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
