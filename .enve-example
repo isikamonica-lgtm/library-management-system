@@ -1,5 +1,0 @@
-# PostgreSQL database connection
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
-
-# Prisma migration connection
-DIRECT_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"

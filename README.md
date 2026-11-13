@@ -1,103 +1,125 @@
-# Library Management System
+Library Management System
 
-## Project Overview
+About the Project
 
-The Library Management System is a backend application developed using NestJS, Prisma ORM and PostgreSQL.
+This project is a backend data layer for a Library Management System. It is built using NestJS, Prisma ORM, and PostgreSQL. The database is designed to organize information about library members, books, genres, and reviews.
 
-The system provides a structured data foundation for managing library users, books, genres and book reviews.
+Technologies Used
 
-## Technology Stack
+- Node.js – Runs the application.
+- NestJS – Provides the backend framework.
+- Prisma ORM – Defines database models and handles database operations.
+- PostgreSQL – Stores the application's data.
+- Supabase – Hosts the PostgreSQL database.
 
-- Node.js
-- NestJS
-- TypeScript
-- Prisma ORM 7
-- PostgreSQL
-- Supabase
+Database Design
 
-## Database Models
+The database is made up of five main models and one enum:
 
-### User
+- User: Holds member details such as name, email, and assigned role.
+- Role: Defines the available user roles: "PATRON" and "LIBRARIAN".
+- Genre: Keeps the names and descriptions of book categories.
+- Book: Contains book details, including title, author, ISBN, publication year, and available copies.
+- Review: Records ratings and comments submitted by users about books.
 
-Stores registered library users, including their names, email addresses and roles.
+Schema Decisions
 
-### Genre
+Why I Used a Separate Genre Model
 
-Stores book categories such as Fiction, Science, Technology and History.
+I decided to keep genres in their own table and connect them to books using "genreId". This means a book stores a reference to its genre instead of repeating the genre's name and description.
 
-### Book
+For example, several books can belong to the Fiction genre without each book having to store the same genre information.
 
-Stores book information, including title, author, ISBN, publication year and available copy counts.
+I chose this approach for a few reasons:
 
-### Review
+1. Less duplication: Each genre is stored once and can be linked to many books.
+2. Easier updates: If I change a genre's description, I only need to update it in one place.
+3. Reliable relationships: The foreign key makes sure that a book is connected to an existing genre.
+4. Simpler data retrieval: Prisma can fetch a book together with its associated genre.
+5. Room for growth: New genres can be added without changing the structure of existing book records.
 
-Stores reviews written by users about books, including ratings and optional comments.
+The relationship is one-to-many: one genre can have several books, while each book is linked to one genre.
 
-## Schema Decisions
+Relational Databases and Document Databases
 
-The Book model references the Genre model through a foreign key called `genreId`.
+For this project, I used PostgreSQL with Prisma because the information has clear relationships. Books belong to genres, and reviews are connected to both books and users.
 
-This design creates a one-to-many relationship between Genre and Book. One genre can contain many books, while each book belongs to one genre.
+In a document database, related information can instead be stored together inside flexible documents. That approach can be useful when information varies significantly or is usually accessed as one complete document.
 
-Using a separate Genre model avoids repeating genre information in every book record. It also improves data consistency because genre information is maintained in one place.
+I preferred a relational database here because keeping related records connected and consistent is important for managing library information.
 
-The User model uses a Role enum to distinguish between PATRON and LIBRARIAN users.
+Database Seeding
 
-The Review model connects User and Book through foreign keys. This allows users to review books while maintaining relational integrity.
+I created a seed file at "api/prisma/seed.ts" to add sample information to the database.
 
-## Database Setup
+The seed file contains:
 
-1. Install dependencies:
+- 4 genres: Technology, Fiction, History, and Science.
+- 15 books shared across those genres.
 
-   `npm install`
+I used Prisma's "upsert()" operation when inserting records. This helps prevent duplicate entries when the seed script is executed more than once.
 
-2. Create a PostgreSQL database using Supabase.
+Setting Up the Project
 
-3. Create an `.env` file using `.env.example` as a guide.
+1. Clone the repository
 
-4. Configure the database connection strings.
+git clone YOUR_GITHUB_REPOSITORY_URL
 
-5. Validate the Prisma schema:
+2. Open the API directory
 
-   `npx prisma validate`
+cd library-management-system/api
 
-6. Apply database migrations:
+3. Install the dependencies
 
-   `npx prisma migrate dev --name init`
+npm install
 
-## Database Seeding
+4. Set up environment variables
 
-The seed file is located at:
+Create a ".env" file in the API directory using ".env.example" as a guide.
 
-`api/prisma/seed.ts`
+Add the required PostgreSQL connection variables:
 
-It creates at least four genres and fifteen books.
+- "DATABASE_URL"
+- "DIRECT_URL"
 
-Run the seed using:
+Use your own database connection details. Keep your actual credentials private and do not commit ".env" to GitHub.
 
-`npx tsx prisma/seed.ts`
+5. Generate the Prisma Client
 
-## Running the Application
+npx prisma generate --config prisma7.config.ts
 
-From the api directory:
+6. Apply database migrations
 
-`npm run start:dev`
+npx prisma migrate dev --config prisma7.config.ts
 
-The NestJS development server starts and watches for code changes.
+7. Add the sample records
 
-## Project Structure
+npx prisma db seed --config prisma7.config.ts
 
-- `api/prisma/schema.prisma` – Database schema.
-- `api/prisma/seed.ts` – Database seed data.
-- `api/src/prisma/prisma.service.ts` – Prisma database service.
-- `api/src/prisma/prisma.module.ts` – Prisma module.
-- `api/prisma7.config.ts` – Prisma configuration.
-- `api/.env.example` – Environment variable template.
+Project Structure
 
-## Future Improvements
+library-management-system/
+├── README.md
+└── api/
+    ├── prisma/
+    │   ├── migrations/
+    │   ├── schema.prisma
+    │   └── seed.ts
+    ├── src/
+    │   ├── prisma/
+    │   │   ├── prisma.module.ts
+    │   │   └── prisma.service.ts
+    │   └── generated/
+    ├── .env
+    ├── .env.example
+    └── prisma7.config.ts
 
-- Book borrowing and returning functionality.
-- User authentication and authorization.
-- Book search and filtering.
-- Review rating validation.
-- Library inventory management.
+Current Progress
+
+- [x] Designed the database schema.
+- [x] Connected PostgreSQL through Supabase.
+- [x] Created and applied the initial migration.
+- [x] Added four genres to the database.
+- [x] Added fifteen sample books.
+- [x] Included the Review model as an additional relationship.
+- [x] Prepared the Prisma configuration and seed script.

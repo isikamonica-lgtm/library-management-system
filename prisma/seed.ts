@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from ''../generated/prisma/client":
+import { PrismaClient } from "../src/generated/prisma/client";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -9,7 +9,6 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Create the four book genres
   const genres = [
     { name: "Technology", description: "Computing, software and technology." },
     { name: "Fiction", description: "Creative stories and novels." },
@@ -25,7 +24,6 @@ async function main() {
     });
   }
 
-  // Book records distributed across the four genres
   const books = [
     { title: "Clean Code", author: "Robert C. Martin", isbn: "9780132350884", publicationYear: 2008, genreName: "Technology" },
     { title: "The Pragmatic Programmer", author: "Andrew Hunt", isbn: "9780135957059", publicationYear: 2019, genreName: "Technology" },

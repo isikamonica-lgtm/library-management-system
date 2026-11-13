@@ -5,7 +5,7 @@
 // Prisma Client generator
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 // PostgreSQL database
